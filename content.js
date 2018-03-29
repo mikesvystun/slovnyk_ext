@@ -8,6 +8,6 @@ $.ajax({
     'original': i
   },
   success: function(resp){
-    console.log(resp.translation);
+    console.log(resp);
   },
 });
