@@ -7,7 +7,7 @@ function isEmpty(obj) {
 }
 
 
-var i = $('h1').text().toLowerCase();
+var i = $('h1').text();
 console.log("to replace: " + i);
 $.ajax({
   url: "http://localhost:3000/request",
