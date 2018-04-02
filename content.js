@@ -8,19 +8,18 @@ function getSelectionText() {
   return text;
 }
 
-function isEmpty(obj) {
+function hasResponse(obj) {
   for(var key in obj) {
   if(obj.hasOwnProperty(key))
-    return false;
-  }
     return true;
+  }
+    return false;
 }
 
 
 $('body').mouseup(function() {
 var i = getSelectionText();
 
-console.log("to replace: " + i);
 $.ajax({
   url: "https://new.slovotvir.org.ua/request",
   type: "POST", 
@@ -28,15 +27,22 @@ $.ajax({
     'original': i
   },
   success: function(resp){
-    console.log(isEmpty(resp))
-    if (!isEmpty(resp)) {
+    console.log(hasResponse(resp))
+    if (hasResponse(resp)) {
+      console.log("to replace: " + i);
       for (var prop in resp) {
         console.log("prop: " + prop)
         console.log("val: " + resp[prop])
-        i = i.replace(prop, resp[prop] );
+
+        var wordCount = i.split(' ').length
+
+        var index = 0;
+        do {
+          i = i.replace(prop, resp[prop] );
+          index ++;
+        } while( index < wordCount + 1);
       };
     console.log("result: " + i);
-    i.parent().after('<h1>' + i + '</h1>');
     };
   },
 });
