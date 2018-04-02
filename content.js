@@ -22,7 +22,7 @@ var i = getSelectionText();
 
 console.log("to replace: " + i);
 $.ajax({
-  url: "http://localhost:3000/request",
+  url: "https://new.slovotvir.org.ua/request",
   type: "POST", 
   data: {
     'original': i
