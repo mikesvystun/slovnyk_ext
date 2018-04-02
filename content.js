@@ -20,7 +20,7 @@ function isEmpty(obj) {
 $('body').mouseup(function() {
 var i = getSelectionText();
 
-
+console.log("to replace: " + i);
 $.ajax({
   url: "http://localhost:3000/request",
   type: "POST", 
