@@ -6,11 +6,10 @@ function syncSlovnyk() {
       var i = 0
       do {
         i ++;
-	chrome.storage.sync.set(
-          resp[i]
-	);
+        chrome.storage.sync.set({"m": resp[i]});
       } while (i < resp.length - 1);
-      chrome.storage.local.get(function(result){
+
+      chrome.storage.sync.get("m", function(result){
         console.log(result);
       });     
     }
