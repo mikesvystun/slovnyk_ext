@@ -1,3 +1,14 @@
+function syncSlovnyk() {
+  $.ajax({ 
+    url: "http://localhost:3000/base",
+    type: "GET",
+    success: function(resp) {
+      console.log(resp)
+    }
+  });  
+}
+
+
 function getSelectionText() {
   var text = "";
   if (window.getSelection) {
@@ -18,10 +29,14 @@ function hasResponse(obj) {
 
 
 $('body').mouseup(function() {
+
+syncSlovnyk();
+
 var i = getSelectionText();
 
 $.ajax({
-  url: "https://new.slovotvir.org.ua/request",
+  // url: "https://new.slovotvir.org.ua/request",
+  url: "http://localhost:3000/request",
   type: "POST", 
   data: {
     'original': i
