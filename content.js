@@ -3,7 +3,16 @@ function syncSlovnyk() {
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
-      console.log(resp)
+      var i = 0
+      do {
+        i ++;
+	chrome.storage.sync.set(
+          resp[i]
+	);
+      } while (i < resp.length - 1);
+      chrome.storage.local.get(function(result){
+        console.log(result);
+      });     
     }
   });  
 }
