@@ -3,7 +3,8 @@ function syncSlovnyk() {
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
-      alert(resp);
+      var obj = JSON.parse(resp);
+      console.log("Raw responce" + obj);
       var i = 0
       do {
         i ++;
@@ -11,7 +12,7 @@ function syncSlovnyk() {
       } while (i < resp.length - 1);
 
       chrome.storage.sync.get("m", function(result){
-        console.log(result);
+        console.log("Stored data" + result);
       });     
     }
   });  
