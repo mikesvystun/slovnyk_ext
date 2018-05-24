@@ -3,16 +3,16 @@ function syncSlovnyk() {
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
-      console.log("Raw responce " + resp);
-      console.log("Raw responce" + obj);
       var i = 0
       do {
         i ++;
-        chrome.storage.sync.set({"m": resp[i]});
+        console.log("Raw responce " + resp[i].original);
+        chrome.storage.sync.set({i: resp[i].original});
       } while (i < resp.length - 1);
 
-      chrome.storage.sync.get("m", function(result){
-        console.log("Stored data" + result);
+      chrome.storage.sync.get(null, function(result){
+	var allKeys = Object.keys(result)
+        console.log("Stored data " + allKeys);
       });     
     }
   });  
