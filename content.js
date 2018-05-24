@@ -3,6 +3,7 @@ function syncSlovnyk() {
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
+      alert(resp);
       var i = 0
       do {
         i ++;
