@@ -10,7 +10,7 @@ function syncSlovnyk() {
         cas[resp[i].original] = resp[i].translation;
         chrome.storage.sync.set(cas);
         i ++;
-      } while (i < resp.length - 1);
+      } while (i < resp.length);
 
       chrome.storage.sync.get(null, function(result){
 	var allKeys = Object.keys(result)
