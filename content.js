@@ -1,5 +1,19 @@
+function needSync() {
+  $.ajax({
+    url: "http://localhost:3000/check",
+    type: 'GET',
+    success: function(resp) {
+      if (resp.sum == chrome.storage.sync.get('sum')){
+        chrome.storage.sync.clear();
+        syncSlovnyk();
+        alert('Slovnyk synced');
+      }
+    }
+  });
+}
+
+
 function syncSlovnyk() {
-  chrome.storage.sync.clear();
   $.ajax({ 
     url: "http://localhost:3000/base",
     type: "GET",
@@ -42,7 +56,7 @@ function hasResponse(obj) {
 
 $('body').mouseup(function() {
 
-syncSlovnyk();
+needSync();
 
 var i = getSelectionText();
 
