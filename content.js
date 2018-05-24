@@ -1,13 +1,15 @@
 function syncSlovnyk() {
+  chrome.storage.sync.clear();
   $.ajax({ 
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
       var i = 0
       do {
+        var cas = {};
+        cas[resp[i].original] = resp[i].translation;
+        chrome.storage.sync.set(cas);
         i ++;
-        console.log("Raw responce " + resp[i].original);
-        chrome.storage.sync.set({i: resp[i].original});
       } while (i < resp.length - 1);
 
       chrome.storage.sync.get(null, function(result){
