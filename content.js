@@ -3,7 +3,7 @@ function syncSlovnyk() {
     url: "http://localhost:3000/base",
     type: "GET",
     success: function(resp) {
-      var obj = JSON.parse(resp);
+      console.log("Raw responce " + resp);
       console.log("Raw responce" + obj);
       var i = 0
       do {
