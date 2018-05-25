@@ -1,13 +1,45 @@
 function needSync() {
   $.ajax({
-    url: "http://localhost:3000/check",
+    url: "http://localhost:3000/base/check",
     type: 'GET',
-    success: function(resp) {
-      if (resp.sum == chrome.storage.sync.get('sum')){
-        chrome.storage.sync.clear();
-        syncSlovnyk();
-        alert('Slovnyk synced');
-      }
+    success: function(actualsize) {
+
+      chrome.storage.sync.get(null, function(result){
+
+        var localsize = 0
+
+	console.log('Assigned default localsize: ' + localsize)
+
+      	if (Object.keys(result).includes('localsize')) {
+	  
+	  console.log("local storage exists, now need to overwrite defaut")
+
+	  console.log(Object.keys(result));
+	  chrome.storage.sync.get(['localsize'], function(result){
+	    localsize = result.localsize;
+	    console.log('default value overwritten with local value')
+            console.log('Localsize1: ' + localsize);
+            console.log('Actualsize1: ' + actualsize);
+	  })
+	}
+
+        if (actualsize != localsize){
+	
+          console.log('now checking if localsize is equal to actual size. / should not be equal')
+
+          console.log('Localsize2: ' + localsize);
+          console.log('Actualsize2: ' + actualsize);
+
+          chrome.storage.sync.clear();
+          chrome.storage.sync.set({'localsize': actualsize});
+	  chrome.storage.sync.get(['localsize'], function(result){
+	    localsize = result.localsize;
+	  })
+          // syncSlovnyk();
+          console.log('Slovnyk synced, actual size: ' + localsize);
+        }
+
+      });
     }
   });
 }
