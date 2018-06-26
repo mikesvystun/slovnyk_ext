@@ -1,44 +1,44 @@
+function test() {
+  var gag = {'asd': "testValue2"}
+  chrome.storage.sync.set(gag, function() {
+    console.log('Value is set to ' + gag['asd']);
+  });
+
+  chrome.storage.sync.get(null , function(result) {
+    console.log('Value currently is ' + result.asd);
+  });
+}
+
+
 function needSync() {
   $.ajax({
     url: "http://localhost:3000/base/check",
     type: 'GET',
     success: function(actualsize) {
 
+      console.log("Actual size: " + actualsize);
+
       chrome.storage.sync.get(null, function(result){
 
-        var localsize = 0
-
-	console.log('Assigned default localsize: ' + localsize)
-
       	if (Object.keys(result).includes('localsize')) {
-	  
-	  console.log("local storage exists, now need to overwrite defaut")
+          chrome.storage.sync.get(null, function(result){
+            localsize = result.localsize;
+          
+            console.log("Local size: " + localsize);
+          
+            if (actualsize == localsize) {
+              console.log("No need to sync")
+            }
 
-	  console.log(Object.keys(result));
-	  chrome.storage.sync.get(['localsize'], function(result){
-	    localsize = result.localsize;
-	    console.log('default value overwritten with local value')
-            console.log('Localsize1: ' + localsize);
-            console.log('Actualsize1: ' + actualsize);
-	  })
-	}
-
-        if (actualsize != localsize){
-	
-          console.log('now checking if localsize is equal to actual size. / should not be equal')
-
-          console.log('Localsize2: ' + localsize);
-          console.log('Actualsize2: ' + actualsize);
-
-          chrome.storage.sync.clear();
-          chrome.storage.sync.set({'localsize': actualsize});
-	  chrome.storage.sync.get(['localsize'], function(result){
-	    localsize = result.localsize;
-	  })
-          // syncSlovnyk();
-          console.log('Slovnyk synced, actual size: ' + localsize);
+            if (actualsize != localsize) {
+              console.log("Syncing slovnyk to match new actual size")
+              syncSlovnyk();
+            }
+          })
+        } else {
+          console.log("Syncing slovnyk for the first time")
+          syncSlovnyk();
         }
-
       });
     }
   });
@@ -46,6 +46,7 @@ function needSync() {
 
 
 function syncSlovnyk() {
+  chrome.storage.sync.clear();
   $.ajax({ 
     url: "http://localhost:3000/base",
     type: "GET",
@@ -58,12 +59,23 @@ function syncSlovnyk() {
         i ++;
       } while (i < resp.length);
 
+      //this call doesn't seem to work. Fix it
+      $.ajax({
+        url: "http://localhost:3000/base/check",
+        type: 'GET',
+        success: function(actualsize) {
+          chrome.storage.sync.set({'localsize': actualsize}); 
+        }             
+      });
+
       chrome.storage.sync.get(null, function(result){
-	var allKeys = Object.keys(result)
+        var allKeys = Object.keys(result)
         console.log("Stored data " + allKeys);
       });     
+
     }
   });  
+
 }
 
 
@@ -85,40 +97,57 @@ function hasResponse(obj) {
     return false;
 }
 
+// replace loan words in a string
+function replaceLoanwords(text) {
+  var responce = {};
+  var array = text.split(' ');
+  //replace individual words
+  
+}
 
+
+function findReplacement(word, responce) {
+  
+}
+
+
+
+
+//main function. commented out for test purposes
 $('body').mouseup(function() {
 
 needSync();
+// syncSlovnyk(); 
 
-var i = getSelectionText();
+// var i = getSelectionText();
 
-$.ajax({
+// $.ajax({
   // url: "https://new.slovotvir.org.ua/request",
-  url: "http://localhost:3000/request",
-  type: "POST", 
-  data: {
-    'original': i
-  },
-  success: function(resp){
-    console.log(hasResponse(resp))
-    if (hasResponse(resp)) {
-      console.log("to replace: " + i);
-      for (var prop in resp) {
-        console.log("prop: " + prop)
-        console.log("val: " + resp[prop])
+//  url: "http://localhost:3000/request",
+//  type: "POST", 
+//  data: {
+//    'original': i
+//  },
+//  success: function(resp){
+//    console.log(hasResponse(resp))
+//    if (hasResponse(resp)) {
+//      console.log("to replace: " + i);
+//      for (var prop in resp) {
+//        console.log("prop: " + prop)
+//        console.log("val: " + resp[prop])
+//
+//        var wordCount = i.split(' ').length
 
-        var wordCount = i.split(' ').length
-
-        var index = 0;
-        do {
-          i = i.replace(prop, resp[prop] );
-          index ++;
-        } while( index < wordCount + 1);
-      };
-    console.log("result: " + i);
-    };
-  },
-});
+//        var index = 0;
+//        do {
+//          i = i.replace(prop, resp[prop] );
+//          index ++;
+//        } while( index < wordCount + 1);
+//      };
+//    console.log("result: " + i);
+//    };
+//  },
+//});
 
 
 });
