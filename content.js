@@ -1,20 +1,9 @@
-function test() {
-  var gag = {'asd': "testValue2"}
-  chrome.storage.sync.set(gag, function() {
-    console.log('Value is set to ' + gag['asd']);
-  });
-
-  chrome.storage.sync.get(null , function(result) {
-    console.log('Value currently is ' + result.asd);
-  });
-}
-
-
 function needSync() {
   $.ajax({
     url: "http://localhost:3000/base/check",
     type: 'GET',
     success: function(actualsize) {
+
 
       console.log("Actual size: " + actualsize);
 
@@ -45,6 +34,7 @@ function needSync() {
 }
 
 
+
 function syncSlovnyk() {
   chrome.storage.sync.clear();
   $.ajax({ 
@@ -59,7 +49,6 @@ function syncSlovnyk() {
         i ++;
       } while (i < resp.length);
 
-      //this call doesn't seem to work. Fix it
       $.ajax({
         url: "http://localhost:3000/base/check",
         type: 'GET',
@@ -71,11 +60,11 @@ function syncSlovnyk() {
       chrome.storage.sync.get(null, function(result){
         var allKeys = Object.keys(result)
         console.log("Stored data " + allKeys);
+        var allValues = Object.values(result)
+        console.log("Stored data " + allValues);
       });     
-
     }
   });  
-
 }
 
 
@@ -113,16 +102,17 @@ function findReplacement(word, responce) {
 
 
 
-//main function. commented out for test purposes
 $('body').mouseup(function() {
 
-needSync();
-// syncSlovnyk(); 
+  needSync();
 
-// var i = getSelectionText();
 
-// $.ajax({
-  // url: "https://new.slovotvir.org.ua/request",
+// main function.  commented out is code that performs replacement on the backend.  Need to move this logic to front-end
+
+//  var i = getSelectionText();
+
+//  $.ajax({
+//  url: "https://new.slovotvir.org.ua/request",
 //  url: "http://localhost:3000/request",
 //  type: "POST", 
 //  data: {
