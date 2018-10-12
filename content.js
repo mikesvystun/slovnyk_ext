@@ -5,7 +5,6 @@ function needSync() {
     type: 'GET',
     success: function(actualsize) {
 
-
       console.log("Actual size: " + actualsize);
 
       chrome.storage.sync.get(null, function(result){
@@ -65,20 +64,22 @@ function syncSlovnyk() {
 function replaceLoanwords(text, result) {
   for (var key in result) {
     if (key == 'localsize') { continue; };
-    // lowercase ending in a space
-    text = text.replace( key + " ", " <span style='color:blue'>" + result[key] + "</span> " );
-    // lowercase ending in a .
-    text = text.replace( key + ".", " <span style='color:blue'>" + result[key] + "</span>." );
-    // lowercase ending in a ,
-    text = text.replace( key + ",", " <span style='color:blue'>" + result[key] + "</span>," );
-    // lowercase ending in a !
-    text = text.replace( key + "!", " <span style='color:blue'>" + result[key] + "</span>!" );
-    // lowercase ending in a ?
-    text = text.replace( key + "?", " <span style='color:blue'>" + result[key] + "</span>?" );
-    // lowercase ending in a <
-    text = text.replace( key + "<", " <span style='color:blue'>" + result[key] + "</span><" );
-    // uppercase ending in a space (in the beginning of a sentence)
-    text = text.replace( key.substr(0,1).toUpperCase() + key.substr(1) + " ", "<span style='color:blue'>" + result[key].substr(0,1).toUpperCase() + result[key].substr(1) + "</span> " );
+    // lowercase ending with a space
+    text = text.replace( key + " ", "<span style='color:green'>" + result[key] + "</span> " );
+    // lowercase ending with a .
+    text = text.replace( key + ".", "<span style='color:green'>" + result[key] + "</span>." );
+    // lowercase ending with a ,
+    text = text.replace( key + ",", "<span style='color:green'>" + result[key] + "</span>," );
+    // lowercase ending with a !
+    text = text.replace( key + "!", "<span style='color:green'>" + result[key] + "</span>!" );
+    // lowercase ending with a ?
+    text = text.replace( key + "?", "<span style='color:green'>" + result[key] + "</span>?" );
+    // lowercase ending with a &
+    text = text.replace( key + "&", "<span style='color:green'>" + result[key] + "</span>&" );
+    // lowercase ending with a <
+    text = text.replace( key + "<", "<span style='color:green'>" + result[key] + "</span><" );
+    // uppercase ending with a space (in the beginning of a sentence)
+    text = text.replace( key.substr(0,1).toUpperCase() + key.substr(1) + " ", "<span style='color:green'>" + result[key].substr(0,1).toUpperCase() + result[key].substr(1) + "</span> " );
   }
   return text;
 }
@@ -88,13 +89,16 @@ function replaceLoanwords(text, result) {
 $( document ).ready(function() {
 
   needSync();
+  
+  var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a']
 
   chrome.storage.sync.get(null, function(result){
-    var text = $('p').text();
-    console.log(text);
-    text = replaceLoanwords(text, result);
-    $('p').html(text);
-    console.log(text);
+    for ( var i = 0; i < tags.length; i++ ) {
+      $( tags[i] ).each (function() {
+        $(this).html(replaceLoanwords($(this).text(), result));
+      });
+    }
+
   });     
 });
 
