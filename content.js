@@ -1,3 +1,4 @@
+// checks if local storage needs to sync data with server (compares number of cases locally with number provided by server)
 function needSync() {
   $.ajax({
     url: "http://localhost:3000/base/check",
@@ -33,8 +34,7 @@ function needSync() {
   });
 }
 
-
-
+// syncs local storage with server
 function syncSlovnyk() {
   chrome.storage.sync.clear();
   $.ajax({ 
@@ -56,88 +56,45 @@ function syncSlovnyk() {
           chrome.storage.sync.set({'localsize': actualsize}); 
         }             
       });
-
-      chrome.storage.sync.get(null, function(result){
-        var allKeys = Object.keys(result)
-        console.log("Stored data " + allKeys);
-        var allValues = Object.values(result)
-        console.log("Stored data " + allValues);
-      });     
     }
   });  
 }
 
-
-function getSelectionText() {
-  var text = "";
-  if (window.getSelection) {
-    text = window.getSelection().toString();
-  } else if (document.selection && document.selection.type != "Control") {
-    text = document.selection.createRange().text;
+// replace loan words in one block of text
+// next: need to add here handling of words starting with caputal letters and those ending with punctiation symbols
+function replaceLoanwords(text, result) {
+  for (var key in result) {
+    if (key == 'localsize') { continue; };
+    // lowercase ending in a space
+    text = text.replace( key + " ", " <span style='color:blue'>" + result[key] + "</span> " );
+    // lowercase ending in a .
+    text = text.replace( key + ".", " <span style='color:blue'>" + result[key] + "</span>." );
+    // lowercase ending in a ,
+    text = text.replace( key + ",", " <span style='color:blue'>" + result[key] + "</span>," );
+    // lowercase ending in a !
+    text = text.replace( key + "!", " <span style='color:blue'>" + result[key] + "</span>!" );
+    // lowercase ending in a ?
+    text = text.replace( key + "?", " <span style='color:blue'>" + result[key] + "</span>?" );
+    // lowercase ending in a <
+    text = text.replace( key + "<", " <span style='color:blue'>" + result[key] + "</span><" );
+    // uppercase ending in a space (in the beginning of a sentence)
+    text = text.replace( key.substr(0,1).toUpperCase() + key.substr(1) + " ", "<span style='color:blue'>" + result[key].substr(0,1).toUpperCase() + result[key].substr(1) + "</span> " );
   }
   return text;
 }
 
-function hasResponse(obj) {
-  for(var key in obj) {
-  if(obj.hasOwnProperty(key))
-    return true;
-  }
-    return false;
-}
 
-// replace loan words in a string
-function replaceLoanwords(text) {
-  var responce = {};
-  var array = text.split(' ');
-  //replace individual words
-  
-}
-
-
-function findReplacement(word, responce) {
-  
-}
-
-
-
-
-$('body').mouseup(function() {
+// main function
+$( document ).ready(function() {
 
   needSync();
 
-
-// main function.  commented out is code that performs replacement on the backend.  Need to move this logic to front-end
-
-//  var i = getSelectionText();
-
-//  $.ajax({
-//  url: "https://new.slovotvir.org.ua/request",
-//  url: "http://localhost:3000/request",
-//  type: "POST", 
-//  data: {
-//    'original': i
-//  },
-//  success: function(resp){
-//    console.log(hasResponse(resp))
-//    if (hasResponse(resp)) {
-//      console.log("to replace: " + i);
-//      for (var prop in resp) {
-//        console.log("prop: " + prop)
-//        console.log("val: " + resp[prop])
-//
-//        var wordCount = i.split(' ').length
-
-//        var index = 0;
-//        do {
-//          i = i.replace(prop, resp[prop] );
-//          index ++;
-//        } while( index < wordCount + 1);
-//      };
-//    console.log("result: " + i);
-//    };
-//  },
-//});
-
-
+  chrome.storage.sync.get(null, function(result){
+    var text = $('p').text();
+    console.log(text);
+    text = replaceLoanwords(text, result);
+    $('p').html(text);
+    console.log(text);
+  });     
 });
+
