@@ -1,4 +1,5 @@
 // checks if local storage needs to sync data with server (compares number of cases locally with number provided by server)
+
 function needSync() {
   $.ajax({
     url: "http://localhost:3000/base/check",
@@ -63,7 +64,7 @@ function syncSlovnyk() {
 // next: need to add here handling of words starting with caputal letters and those ending with punctiation symbols
 function replaceLoanwords(text, result) {
   for (var key in result) {
-    if (key == 'localsize') { continue; };
+    if (key == 'localsize' || key == 'switcher' ) { continue; };
     // lowercase ending with a space
     text = text.replace( key + " ", "<span style='color:green'>" + result[key] + "</span> " );
     // lowercase ending with a .
@@ -90,15 +91,17 @@ $( document ).ready(function() {
 
   needSync();
   
-  var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a']
+  var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a'];
 
   chrome.storage.sync.get(null, function(result){
-    for ( var i = 0; i < tags.length; i++ ) {
-      $( tags[i] ).each (function() {
-        $(this).html(replaceLoanwords($(this).text(), result));
-      });
+    if (result.switcher) {
+      for ( var i = 0; i < tags.length; i++ ) {
+        $( tags[i] ).each (function() {
+          $(this).html(replaceLoanwords($(this).text(), result));
+        });
+      }
     }
-
   });     
+
 });
 

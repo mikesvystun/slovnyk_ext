@@ -1,9 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-    var i = document.createElement('p');
-    i.className = 'title';
-    i.innerHTML = tabs[0].getElementsByTagName('h2')[0].textContent ;
-    var tag = document.getElementsByTagName('body')[0];
-    tag.appendChild(i);
-  });
-}, false);
+  var switcher = document.getElementById('switcher');
+
+  switcher.addEventListener('click', function() {
+    if (switcher.checked) {
+      chrome.storage.sync.set({'switcher': 1});
+
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+      });
+
+    } else {
+      chrome.storage.sync.set({'switcher': 0});
+
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.update(tabs[0].id, {url: tabs[0].url});
+      });
+
+    }
+  })
+
+  window.onload = function() {
+    chrome.storage.sync.get(null, function(result) {
+      switcher.checked = result.switcher;
+    })
+  }
+})
