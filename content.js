@@ -2,7 +2,7 @@
 
 function needSync() {
   $.ajax({
-    url: "http://localhost:3000/base/check",
+    url: "https://new.slovotvir.org.ua/base/check",
     type: 'GET',
     success: function(actualsize) {
 
@@ -38,7 +38,7 @@ function needSync() {
 function syncSlovnyk() {
   chrome.storage.sync.clear();
   $.ajax({ 
-    url: "http://localhost:3000/base",
+    url: "https://new.slovotvir.org.ua/base",
     type: "GET",
     success: function(resp) {
       var i = 0
@@ -50,7 +50,7 @@ function syncSlovnyk() {
       } while (i < resp.length);
 
       $.ajax({
-        url: "http://localhost:3000/base/check",
+        url: "https://new.slovotvir.org.ua/base/check",
         type: 'GET',
         success: function(actualsize) {
           chrome.storage.sync.set({'localsize': actualsize}); 
