@@ -44,12 +44,17 @@ function Vocabulary() {
       type: "GET",
       success: function (resp) {
         var i = 0
-        do {
-          var cas = {};
-          cas[resp[i].original] = resp[i].translation;
-          chrome.storage.sync.set(cas);
-          i++;
-        } while (i < resp.length);
+        var cas = {};
+        resp.forEach(function(item, index) {
+          if (cas[item.original]) {
+            if (!cas[item.original].match(new RegExp(item.translation))) {
+              cas[item.original] = cas[item.original] + ', ' + item.translation;
+            }
+          } else {
+            cas[item.original] = item.translation;
+          }
+        });
+        chrome.storage.sync.set(cas);
 
         $.ajax({
           url: "https://new.slovotvir.org.ua/base/check",
@@ -64,41 +69,70 @@ function Vocabulary() {
 
   // replace loan words in one block of text
   // next: need to add here handling of words starting with caputal letters and those ending with punctiation symbols
-  this.replaceLoanwords = function (text, result) {
-    for (var key in result) {
-      if (key == 'localsize' || key == 'switcher') { continue; };
-
-      var wordEndings = [",", "!", "?", "&", "<", " ", "."];
-
-
-      for (i = 0; i < wordEndings.length; i++) {
-
-        if (text.includes(key + wordEndings[i])) {
-
-          text = text.replace(key + wordEndings[i], key + "<span style='color:green'> (" + result[key] + ")</span>" + wordEndings[i]);
-
-        }
-        continue;
-
-        // uppercase ending with a space (in the beginning of a sentence)
-        text = text.replace(key.substr(0, 1).toUpperCase() + key.substr(1) + " ", "<span style='color:green'>" + result[key].substr(0, 1).toUpperCase() + result[key].substr(1) + "</span> ");
-      }
-    }
-    return text;
-  }
+  // this.replaceLoanwords = function (text, result) {
+  //   for (var key in result) {
+  //     if (key == 'localsize' || key == 'switcher') { continue; };
+  //
+  //     var wordEndings = [",", "!", "?", "&", "<", " ", "."];
+  //
+  //
+  //     for (i = 0; i < wordEndings.length; i++) {
+  //
+  //       if (text.includes(key + wordEndings[i])) {
+  //
+  //         text = text.replace(key + wordEndings[i], key + "<span style='color:green'> (" + result[key] + ")</span>" + wordEndings[i]);
+  //
+  //       }
+  //       continue;
+  //
+  //       // uppercase ending with a space (in the beginning of a sentence)
+  //       text = text.replace(key.substr(0, 1).toUpperCase() + key.substr(1) + " ", "<span style='color:green'>" + result[key].substr(0, 1).toUpperCase() + result[key].substr(1) + "</span> ");
+  //     }
+  //   }
+  //   return text;
+  // }
+// };
 
   this.performCheck = function () {
+
     var _this = this;
-    var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a'];
+    var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'em', 'i'];
 
     chrome.storage.sync.get(null, function (result) {
 
-      console.log(result);
+      console.log(result)
 
       if (result.switcher) {
         for (var i = 0; i < tags.length; i++) {
           $(tags[i]).each(function () {
-            $(this).html(_this.replaceLoanwords($(this).text(), result));
+            var oldValue = undefined;
+            var _this = this;
+            var text = $(this).text()
+            var splittedText = text.match(/[а-яїієґ'\-]+/gi);
+            if (!splittedText) { return };
+            splittedText.forEach(function(item, index) {
+              var alreadyReplaced = false;
+              var replacement = undefined;
+
+              if (result[item.toLocaleLowerCase()] !== undefined) {
+                oldValue = item;
+                replacement = result[item.toLocaleLowerCase()];
+                twoWordKey = splittedText[index - 1] + ' ' + item;
+                if (splittedText[index - 1] && result[twoWordKey.toLocaleLowerCase()]) {
+                  oldValue = twoWordKey;
+                  replacement = result[twoWordKey.toLocaleLowerCase()];
+                }
+              }
+
+              if (replacement && !alreadyReplaced) {
+                var statement = new RegExp(oldValue, 'i');
+                var newText = oldValue + '<span style="color:green">' + ' (' + replacement + ') </span>';
+                console.log(newText)
+
+                $(_this).html($(_this).html().replace(statement, newText));
+                replacement = undefined;
+              }
+            });
           });
         }
       }
@@ -113,4 +147,3 @@ $(document).ready(function () {
   vocabulary.needSync();
   vocabulary.performCheck();
 });
-
