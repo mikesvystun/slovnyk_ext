@@ -94,17 +94,13 @@ function Vocabulary() {
 // };
 
   this.performCheck = function () {
-
-    var _this = this;
     var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'em', 'i'];
 
     chrome.storage.sync.get(null, function (result) {
 
-      console.log(result)
-
       if (result.switcher) {
-        for (var i = 0; i < tags.length; i++) {
-          $(tags[i]).each(function () {
+        tags.forEach(function(item, index) {
+          $(item).each(function () {
             var oldValue = undefined;
             var _this = this;
             var text = $(this).text()
@@ -114,7 +110,7 @@ function Vocabulary() {
               var alreadyReplaced = false;
               var replacement = undefined;
 
-              if (result[item.toLocaleLowerCase()] !== undefined) {
+              if (result[item.toLocaleLowerCase()]) {
                 oldValue = item;
                 replacement = result[item.toLocaleLowerCase()];
                 twoWordKey = splittedText[index - 1] + ' ' + item;
@@ -124,17 +120,16 @@ function Vocabulary() {
                 }
               }
 
-              if (replacement && !alreadyReplaced) {
+              if (replacement && _this.childNodes[0] && _this.childNodes[0].nodeType == 3) {
                 var statement = new RegExp(oldValue, 'i');
-                var newText = oldValue + '<span style="color:green">' + ' (' + replacement + ') </span>';
-                console.log(newText)
+                var newText = oldValue + ' (' + replacement + ')';
 
-                $(_this).html($(_this).html().replace(statement, newText));
+                _this.childNodes[0].nodeValue = _this.childNodes[0].nodeValue.replace(statement, newText)
                 replacement = undefined;
               }
             });
           });
-        }
+        });
       }
     });
   }
