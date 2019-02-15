@@ -93,7 +93,7 @@ function Vocabulary() {
 
   this.performCheck = function () {
     var _this = this;
-    var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'em', 'i'];
+    var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'em', 'i', 'div', 'span'];
 
     chrome.storage.sync.get(null, function (result) {
 
