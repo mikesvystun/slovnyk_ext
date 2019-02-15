@@ -67,67 +67,49 @@ function Vocabulary() {
     });
   }
 
-  // replace loan words in one block of text
-  // next: need to add here handling of words starting with caputal letters and those ending with punctiation symbols
-  // this.replaceLoanwords = function (text, result) {
-  //   for (var key in result) {
-  //     if (key == 'localsize' || key == 'switcher') { continue; };
-  //
-  //     var wordEndings = [",", "!", "?", "&", "<", " ", "."];
-  //
-  //
-  //     for (i = 0; i < wordEndings.length; i++) {
-  //
-  //       if (text.includes(key + wordEndings[i])) {
-  //
-  //         text = text.replace(key + wordEndings[i], key + "<span style='color:green'> (" + result[key] + ")</span>" + wordEndings[i]);
-  //
-  //       }
-  //       continue;
-  //
-  //       // uppercase ending with a space (in the beginning of a sentence)
-  //       text = text.replace(key.substr(0, 1).toUpperCase() + key.substr(1) + " ", "<span style='color:green'>" + result[key].substr(0, 1).toUpperCase() + result[key].substr(1) + "</span> ");
-  //     }
-  //   }
-  //   return text;
-  // }
-// };
+
+  this.replaceLoanwords = function (_this, splittedText, result, item, index) {
+    var replacement = undefined;
+
+    if (result[item.toLocaleLowerCase()]) {
+      oldValue = item;
+      replacement = result[item.toLocaleLowerCase()];
+      twoWordKey = splittedText[index - 1] + ' ' + item;
+
+      if (splittedText[index - 1] && result[twoWordKey.toLocaleLowerCase()]) {
+        oldValue = twoWordKey;
+        replacement = result[twoWordKey.toLocaleLowerCase()];
+      }
+    }
+
+    if (replacement && _this.childNodes[0] && _this.childNodes[0].nodeType == 3) {
+      var statement = new RegExp(oldValue, 'i');
+      var newText = oldValue + ' (' + replacement + ')';
+
+      _this.childNodes[0].nodeValue = _this.childNodes[0].nodeValue.replace(statement, newText);
+      replacement = undefined;
+    }
+  }
 
   this.performCheck = function () {
+    var _this = this;
     var tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'em', 'i'];
 
     chrome.storage.sync.get(null, function (result) {
 
       if (result.switcher) {
-        tags.forEach(function(item, index) {
+        tags.forEach(function(item) {
           $(item).each(function () {
             var oldValue = undefined;
-            var _this = this;
+            var __this = this;
             var text = $(this).text()
             var splittedText = text.match(/[а-яїієґ'\-]+/gi);
             if (!splittedText) { return };
+
             splittedText.forEach(function(item, index) {
-              var alreadyReplaced = false;
-              var replacement = undefined;
-
-              if (result[item.toLocaleLowerCase()]) {
-                oldValue = item;
-                replacement = result[item.toLocaleLowerCase()];
-                twoWordKey = splittedText[index - 1] + ' ' + item;
-                if (splittedText[index - 1] && result[twoWordKey.toLocaleLowerCase()]) {
-                  oldValue = twoWordKey;
-                  replacement = result[twoWordKey.toLocaleLowerCase()];
-                }
-              }
-
-              if (replacement && _this.childNodes[0] && _this.childNodes[0].nodeType == 3) {
-                var statement = new RegExp(oldValue, 'i');
-                var newText = oldValue + ' (' + replacement + ')';
-
-                _this.childNodes[0].nodeValue = _this.childNodes[0].nodeValue.replace(statement, newText)
-                replacement = undefined;
-              }
+              _this.replaceLoanwords(__this, splittedText, result, item, index);
             });
+
           });
         });
       }
