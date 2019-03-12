@@ -46,12 +46,12 @@ function Vocabulary() {
         var i = 0
         var cas = {};
         resp.forEach(function(item, index) {
-          if (cas[item.original]) {
-            if (!cas[item.original].match(new RegExp(item.translation))) {
-              cas[item.original] = cas[item.original] + ', ' + item.translation;
+          if (cas[item[1]]) {
+            if (!cas[item[1]].match(new RegExp(item.translation))) {
+              cas[item[1]] = cas[item[1]] + ', ' + item[2];
             }
           } else {
-            cas[item.original] = item.translation;
+            cas[item[1]] = item[2];
           }
         });
         chrome.storage.sync.set(cas);
