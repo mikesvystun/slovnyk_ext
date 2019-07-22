@@ -60,3 +60,10 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.dic-status {
+  margin-top: 10px;
+}
+.dic-status--success { color: darkgreen }
+.dic-status--failure { color: darkred }
+.dic-status--disabled { color: dimgray }

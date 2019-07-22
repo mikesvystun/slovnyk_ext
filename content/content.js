@@ -2,18 +2,6 @@ class SlovnykContent {
   rootSpanClass = '__slovnyk';
   tooltipSpanClass = '__slovnyk__tooltip';
 
-  initHandlers() {
-    chrome.runtime.onMessage.addListener(request => {
-      if (request.slovnykContentEvent) {
-        this[request.slovnykContentEvent.method](...[].concat(request.slovnykContentEvent.args || []));
-      }
-    });
-  }
-
-  callBg(method, args = null) {
-    chrome.runtime.sendMessage({ slovnykBgEvent: { method: method, args: args } });
-  }
-
   replaceWords(dictionary) {
     this.dictionary = dictionary;
     let wordsMap = dictionary.wordsMap;
@@ -70,8 +58,14 @@ class SlovnykContent {
   }
 }
 
-let slovnykContent = new SlovnykContent();
-window.SlovnykContent = slovnykContent;
-
-slovnykContent.initHandlers();
-slovnykContent.callBg('ensureVocabularyAndCallContent');
+chrome.storage.local.get(['slovnykEnabled', 'wordsMap'], data => {
+  if (data.slovnykEnabled) {
+    if (!window.SlovnykContent) {
+      window.SlovnykContent = new SlovnykContent();
+    }
+    if (data.wordsMap) {
+      console.log(data.wordsMap)
+      window.SlovnykContent.replaceWords({ wordsMap: data.wordsMap })
+    }
+  }
+});

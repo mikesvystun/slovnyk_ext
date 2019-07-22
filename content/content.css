@@ -1,0 +1,37 @@
+.__slovnyk {
+  border-bottom: 2px dashed red;
+  position: relative;
+}
+.__slovnyk__tooltip {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  display: none;
+  padding: 0.3em 0.6em;
+  background: lightgreen;
+  color: black;
+  border: 1px solid darkgreen;
+  border-radius: 5px;
+  transform: translateX(-50%) translateY(-100%);
+}
+.__slovnyk__tooltip::before,
+.__slovnyk__tooltip::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  border-top: 6px solid black;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+.__slovnyk__tooltip::after {
+  bottom: 1px;
+  border-top-color: lightgreen;
+}
+.__slovnyk:hover .__slovnyk__tooltip {
+  display: block;
+}
