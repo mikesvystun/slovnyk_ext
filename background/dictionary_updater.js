@@ -9,9 +9,9 @@ class DictionaryUpdater {
 
   static async perform({ forceUpdate } = {}) {
     await this.performIfStale(forceUpdate, async () => {
-      await this.updateDictionaryIfChanged();
+      await this.updateDictionary();
     });
-    return await this.storage.get('wordsMap');
+    return await this.storage.get('dictionary');
   }
 
   static async performIfStale(forceUpdate, onSuccess) {
@@ -29,26 +29,38 @@ class DictionaryUpdater {
     }
   }
 
-  static async updateDictionaryIfChanged() {
-    let response = await fetch('https://new.slovotvir.org.ua/base/check');
-    if (!response.ok) { throw new Error('Cannot check') }
-
-    let dictionaryCheck = await response.text();
-    let localDictionaryCheck = await this.storage.get('dictionaryCheck');
-
-    if (localDictionaryCheck !== dictionaryCheck) {
-      await this.updateDictionary();
-      await this.storage.set({ dictionaryCheck });
-    }
-  }
-
   static async updateDictionary() {
-    let response = await fetch('https://new.slovotvir.org.ua/base');
-    if (!response.ok) { throw new Error('Cannot download') }
+    let { lastModifiedStr } = await this.storage.get('lastModifiedStr');
+    let options = { headers: { 'If-Modified-Since': lastModifiedStr } };
 
-    let items = await response.json();
-    let wordsMap = {};
-    items.forEach(([ id, word, translation ]) => { wordsMap[word] = translation });
-    await this.storage.set({ wordsMap });
+    let response = await fetch('https://new.slovotvir.org.ua/api/dictionary', options);
+    if (response.status === 304) { return }
+    if (!response.ok) { throw new Error('Помилка завантаження') }
+
+    lastModifiedStr = response.headers.get('last-modified');
+    await this.storage.set({ lastModifiedStr });
+
+    let dic = await response.json();
+    let dictionary = {
+      wordsCount: dic['words_count'],
+      pairs: dic['pairs'],
+      pairsCount: Object.keys(dic['pairs']).length,
+      lastModified: new Date(lastModifiedStr).toLocaleDateString('uk'),
+    };
+    await this.storage.set({ dictionary });
   }
+
+  // static camelize(s) {
+  //   return s.replace(/(_[a-z])/ig, $1 => {
+  //     return $1.toUpperCase().replace('_', '');
+  //   });
+  // };
+  //
+  // static camelizeKeys(o) {
+  //   const n = {};
+  //   Object.keys(o).forEach(k => {
+  //     n[this.camelize(k)] = o[k];
+  //   });
+  //   return n;
+  // }
 }

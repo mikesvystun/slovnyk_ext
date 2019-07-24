@@ -30,11 +30,16 @@ class SlovnykPopup {
     if (slovnykEnabled) {
       chrome.runtime.sendMessage({ bgEvent: 'updateDictionary' }, data => {
         let success = data.success;
-        let text = success ? `Словник оновлено ${data.lastUpdated}` : data.errorMessage;
 
         this.dicStatusEl.classList.toggle('dic-status--success', success);
         this.dicStatusEl.classList.toggle('dic-status--failure', !success);
-        this.dicStatusEl.innerText = text;
+        if (success) {
+          this.dicStatusEl.innerHTML = `Словник за ${data.dictionary.lastModified}` +
+            `<br>${data.dictionary.wordsCount} слів` +
+            `<br>${data.dictionary.pairsCount} словоформ`;
+        } else {
+          this.dicStatusEl.innerText = data.errorMessage;
+        }
       });
     } else {
       this.dicStatusEl.classList.add('dic-status--disabled');

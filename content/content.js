@@ -2,9 +2,8 @@ class SlovnykContent {
   rootSpanClass = '__slovnyk';
   tooltipSpanClass = '__slovnyk__tooltip';
 
-  replaceWords(dictionary) {
-    this.dictionary = dictionary;
-    let wordsMap = dictionary.wordsMap;
+  replaceWords({ pairs }) {
+    this.pairs = pairs;
     let wordsRegexpString = this.composeWordsRegexpString();
 
     let wordsRegexp = new RegExp(`(?<=^|[^а-яїієґ])(?:${wordsRegexpString})(?=$|[^а-яїієґ])`, 'gi');
@@ -31,7 +30,7 @@ class SlovnykContent {
         rootSpan.appendChild(document.createTextNode(fullNodeText.slice(match.index, newOffset)));
         let tooltipSpan = document.createElement('span');
         tooltipSpan.className = this.tooltipSpanClass;
-        tooltipSpan.appendChild(document.createTextNode(wordsMap[match[0]]));
+        tooltipSpan.appendChild(document.createTextNode(pairs[match[0]]));
         rootSpan.appendChild(tooltipSpan);
         fragment.appendChild(rootSpan);
         offset = newOffset;
@@ -51,21 +50,19 @@ class SlovnykContent {
   }
 
   composeWordsRegexpString() {
-    let words = Object.keys(this.dictionary.wordsMap);
-    words.sort((a, b) => b.length - a.length);
+    let words = Object.keys(this.pairs);
     words = words.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); // escape words for Regexp
     return words.join('|');
   }
 }
 
-chrome.storage.local.get(['slovnykEnabled', 'wordsMap'], data => {
+chrome.storage.local.get(['slovnykEnabled', 'dictionary'], data => {
   if (data.slovnykEnabled) {
     if (!window.SlovnykContent) {
       window.SlovnykContent = new SlovnykContent();
     }
-    if (data.wordsMap) {
-      console.log(data.wordsMap)
-      window.SlovnykContent.replaceWords({ wordsMap: data.wordsMap })
+    if (data.dictionary) {
+      window.SlovnykContent.replaceWords(data.dictionary);
     }
   }
 });

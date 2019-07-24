@@ -9,11 +9,12 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.bgEvent === 'updateDictionary') {
-    DictionaryUpdater.perform({ forceUpdate: true }).then(() => {
+    DictionaryUpdater.perform({ forceUpdate: true }).then(({ dictionary }) => {
       sendResponse({
         success: DictionaryUpdater.lastError == null,
         errorMessage: DictionaryUpdater.lastError && DictionaryUpdater.lastError.message,
         lastUpdated: DictionaryUpdater.lastUpdated,
+        dictionary,
       });
     });
     return true;
