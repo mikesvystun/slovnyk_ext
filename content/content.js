@@ -22,7 +22,12 @@ class SlovnykContent {
       let fragment = null;
       let offset = 0;
       while ((match = wordsRegexp.exec(fullNodeText))) {
-        let newOffset = match.index + match[0].length;
+        let word = match[0].toLowerCase();
+        let translation = pairs[word];
+        if (!translation) {
+          continue;
+        }
+        let newOffset = match.index + word.length;
         fragment = fragment || document.createDocumentFragment();
         fragment.appendChild(document.createTextNode(fullNodeText.slice(offset, match.index)));
         let rootSpan = document.createElement('span');
@@ -30,7 +35,7 @@ class SlovnykContent {
         rootSpan.appendChild(document.createTextNode(fullNodeText.slice(match.index, newOffset)));
         let tooltipSpan = document.createElement('span');
         tooltipSpan.className = this.tooltipSpanClass;
-        tooltipSpan.appendChild(document.createTextNode(pairs[match[0]]));
+        tooltipSpan.appendChild(document.createTextNode(translation));
         rootSpan.appendChild(tooltipSpan);
         fragment.appendChild(rootSpan);
         offset = newOffset;
