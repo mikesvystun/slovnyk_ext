@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  
+
   "name": "Словник",
   "description": "Пропонує заміну запозиченим словам",
   "version": "1.0",
@@ -31,6 +31,11 @@
     "activeTab",
     "storage",
     "*://new.slovotvir.org.ua/"
+  ],
+
+  "web_accessible_resources": [
+    "assets/logo.svg",
+    "assets/ProximaNova-Semibold.woff2"
   ]
 
 }

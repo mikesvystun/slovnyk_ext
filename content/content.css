@@ -1,36 +1,41 @@
+@font-face {
+  font-family: 'ProximaNova';
+  src: font-url('assets/ProximaNova-Semibold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+}
+
 .__slovnyk {
   border-bottom: 2px dashed red;
   position: relative;
 }
 .__slovnyk__tooltip {
   position: absolute;
-  top: -3px;
-  left: 50%;
+  top: -0.3em;
+  left: -1em;
+  z-index: 100000;
   display: none;
-  padding: 0.3em 0.6em;
-  background: lightgreen;
+  padding: 0.45em 1em 0.4em 2.3em;
+  background: white url("chrome-extension://ccmhkbcdkmclgonopekhmeegfjljpcnn/assets/logo.svg") no-repeat 0.6em center / 1.2em;
+  font: 600 1em/1.2 "ProximaNova", sans-serif;
   color: black;
-  border: 1px solid darkgreen;
-  border-radius: 5px;
-  transform: translateX(-50%) translateY(-100%);
+  border-radius: 0.9em;
+  transform: translateY(-100%);
+  box-shadow: 0 0.05em 0.5em 0 rgba(0, 0, 0, 0.2);
 }
-.__slovnyk__tooltip::before,
 .__slovnyk__tooltip::after {
   content: '';
   display: block;
   width: 0;
   height: 0;
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  border-top: 6px solid black;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-}
-.__slovnyk__tooltip::after {
   bottom: 1px;
-  border-top-color: lightgreen;
+  left: 2em;
+  transform: translateX(-50%) translateY(100%);
+  border-top: 0.5em solid white;
+  border-left: 0.5em solid transparent;
+  border-right: 0.5em solid transparent;
+
 }
 .__slovnyk:hover .__slovnyk__tooltip {
   display: block;
