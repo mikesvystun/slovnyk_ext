@@ -6,6 +6,9 @@
   "version": "1.0",
 
   "browser_action": {
+    "default_icon": {
+      "32": "assets/icon-32.png"
+    },
     "default_popup": "popup/popup.html"
   },
 

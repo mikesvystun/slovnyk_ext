@@ -18,32 +18,39 @@ class SlovnykPopup {
 
       this.slovnykEnabledToggled(data.slovnykEnabled);
     });
+
+    this.assignLinkHandlers();
   }
 
   static slovnykEnabledToggled(slovnykEnabled) {
+    document.querySelector('.dic-enabled-text').innerText = slovnykEnabled ? 'Словник працює' : 'Словник вимкнено';
     this.dicStatusEl = this.dicStatusEl || document.querySelector('.dic-status');
-    this.dicStatusEl.classList.remove('dic-status--success');
-    this.dicStatusEl.classList.remove('dic-status--failure');
-    this.dicStatusEl.classList.remove('dic-status--disabled');
-    this.dicStatusEl.innerText = '';
+    this.failureEl = this.failureEl || this.dicStatusEl.querySelector('.dic-status--failure');
+
+    this.dicStatusEl.classList.toggle('is-hidden', !slovnykEnabled);
 
     if (slovnykEnabled) {
       chrome.runtime.sendMessage({ bgEvent: 'updateDictionary' }, data => {
         let success = data.success;
 
-        this.dicStatusEl.classList.toggle('dic-status--success', success);
-        this.dicStatusEl.classList.toggle('dic-status--failure', !success);
+        this.failureEl.classList.toggle('is-hidden', !success);
+
         if (success) {
-          this.dicStatusEl.innerHTML = `Словник за ${data.dictionary.lastModified}` +
-            `<br>${data.dictionary.wordsCount} слів` +
-            `<br>${data.dictionary.pairsCount} словоформ`;
+          this.dicStatusEl.querySelector('.dic-status--last-updated').innerText = data.dictionary.lastModified;
+          this.dicStatusEl.querySelector('.dic-status--words').innerText = data.dictionary.wordsCount;
+          this.dicStatusEl.querySelector('.dic-status--word-forms').innerText = data.dictionary.pairsCount;
         } else {
-          this.dicStatusEl.innerText = data.errorMessage;
+          this.failureEl.innerText = data.errorMessage;
         }
       });
-    } else {
-      this.dicStatusEl.classList.add('dic-status--disabled');
-      this.dicStatusEl.innerText = 'Словник вимкнено';
+    }
+  }
+
+  static assignLinkHandlers() {
+    for (let link of document.querySelectorAll('a')) {
+      link.addEventListener('click', e => {
+        chrome.tabs.create({ url: e.target.href });
+      });
     }
   }
 

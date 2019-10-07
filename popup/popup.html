@@ -5,12 +5,30 @@
     <link rel="stylesheet" type="text/css" href="popup.css">
   </head>
   <body>
-    <p>Вимикач словника</p>
-    <label class="switch">
-      <input type="checkbox" id="switcher">
-      <span class="slider round"></span>
-    </label>
-    <div class="dic-status"></div>
+    <ul class="menu">
+
+      <li>
+        <a href="https://slovotvir.org.ua/about">Про проєкт</a>
+      </li>
+
+      <li class="flex-list-item">
+        <div class="flex-list-item--text dic-enabled-text">Словник</div>
+        <label class="switch">
+          <input type="checkbox" id="switcher">
+          <span class="slider"></span>
+        </label>
+      </li>
+
+      <li class="dic-status">
+        <p class="dic-status--main">Словник за <span class="dic-status--last-updated">…</span></p>
+        <p class="dic-status--meta">
+          <span class="dic-status--words">…</span> слів<br>
+          <span class="dic-status--word-forms">…</span> словоформ
+        </p>
+        <p class="dic-status--failure is-hidden"></p>
+      </li>
+
+    </ul>
     <script src="../shared/chrome_storage_promise.js"></script>
     <script src="popup.js"></script>
   </body>
