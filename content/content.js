@@ -4,6 +4,7 @@ class SlovnykContent {
 
   replaceWords({ pairs }) {
     this.pairs = pairs;
+    this.clearAllCache();
     let wordsRegexpString = this.composeWordsRegexpString();
 
     let wordsRegexp = new RegExp(`(?<=^|[^а-яїієґ])(?:${wordsRegexpString})(?=$|[^а-яїієґ])`, 'gi');
@@ -23,7 +24,7 @@ class SlovnykContent {
       let offset = 0;
       while ((match = wordsRegexp.exec(fullNodeText))) {
         let word = match[0].toLowerCase();
-        let translation = pairs[word];
+        let translation = this.findTranslationByWord(word);
         if (!translation) {
           continue;
         }
@@ -55,9 +56,55 @@ class SlovnykContent {
   }
 
   composeWordsRegexpString() {
-    let words = Object.keys(this.pairs);
-    words = words.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); // escape words for Regexp
-    return words.join('|');
+    return Object
+      .keys(this.pairs)
+      .map(s => this.escapeRegexSpecialSymbols(s))
+      .map(s => this.composeSimilarWordRegexpStr(s))
+      .join('|');
+  }
+
+  escapeRegexSpecialSymbols(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  composeSimilarWordRegexpStr(str) {
+    return str.replace(/[іигґх]/g, c => c === 'і' || c === 'и' ? '[іи]' : '[гґх]');
+  }
+
+  findTranslationByWord(word) {
+    let translation = this.pairs[word];
+    if (!translation) {
+      let indexLookupRegex = new RegExp(`${this.composeSimilarWordRegexpStr(word)}=(\\d+)`);
+      let m = this.tranIndexLookupStr.match(indexLookupRegex);
+      if (m) {
+        let translationIndex = +m[1];
+        translation = this.allTranslations[translationIndex];
+      }
+    }
+    return translation;
+  }
+
+  get tranIndexLookupStr() {
+    if (!this._tranIndexLookupStr) {
+      this._tranIndexLookupStr = Object
+        .keys(this.pairs)
+        .map(k => this.escapeRegexSpecialSymbols(k))
+        .map((k, i) => `${k}=${i}`)
+        .join('|');
+    }
+    return this._tranIndexLookupStr;
+  }
+
+  get allTranslations() {
+    if (!this._allTranslations) {
+      this._allTranslations = Object.values(this.pairs);
+    }
+    return this._allTranslations;
+  }
+
+  clearAllCache() {
+    this._tranIndexLookupStr = null;
+    this._allTranslations = null;
   }
 }
 

@@ -15,7 +15,7 @@
   left: -1em;
   z-index: 100000;
   display: none;
-  padding: 0.45em 1em 0.4em 2.3em;
+  padding: 0.45em 0.9em 0.4em 2.3em;
   background: white url("chrome-extension://ccmhkbcdkmclgonopekhmeegfjljpcnn/assets/logo.svg") no-repeat 0.6em center / 1.2em;
   font: 600 1em/1.2 "ProximaNova", sans-serif;
   color: black;

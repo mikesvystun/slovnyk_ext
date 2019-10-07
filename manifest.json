@@ -34,8 +34,7 @@
   ],
 
   "web_accessible_resources": [
-    "assets/logo.svg",
-    "assets/ProximaNova-Semibold.woff2"
+    "assets/*"
   ]
 
 }
