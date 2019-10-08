@@ -16,6 +16,7 @@ body {
   background-color: lime;
   margin: 0;
   font: 400 18px/1.2 "ProximaNova", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .menu {
